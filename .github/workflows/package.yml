@@ -25,6 +25,8 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: icbc-signed-widget-${{ github.run_id }}
-          path: artifacts/*.wgt
+          path: |
+            artifacts/icbc-tv-*.wgt
+            !artifacts/*-unsigned.wgt
           if-no-files-found: error
           retention-days: 14

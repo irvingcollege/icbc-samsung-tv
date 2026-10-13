@@ -11,6 +11,7 @@ npm ci
 npm run check
 npm test
 npm run build
+npm run package:unsigned
 npm start
 ```
 
@@ -77,7 +78,7 @@ For automated validation, SDK signing, dedicated-runner configuration and the fu
 TIZEN_SECURITY_PROFILE=ICBC-TV npm run package:tizen
 ```
 
-This creates `artifacts/icbc-tv-1.0.0.wgt` only after a successful SDK build/sign operation and archive checks. Without the SDK/profile, it fails rather than fabricating a signed widget. Normal GitHub CI uploads production files; the manual signed-widget workflow requires a trusted, preconfigured Samsung signing runner.
+This creates `artifacts/icbc-tv-1.0.0.wgt` only after a successful SDK build/sign operation and archive checks. Without the SDK/profile, it fails rather than fabricating a signed widget. For an unsigned development archive without SDK or credentials, run `npm run package:unsigned`; output is `artifacts/icbc-tv-1.0.0-unsigned.wgt`. It is not a signed TV-installation or store-submission artifact. Normal GitHub CI uploads production files and the separately labeled unsigned widget; the manual signed-widget workflow requires a trusted, preconfigured Samsung signing runner.
 
 ## Samsung Seller Office submission
 

@@ -8,6 +8,37 @@ The app targets Samsung Tizen **4.0+**, landscape **1920×1080**. `config.xml` r
 
 This cloud machine has Node and Chromium, but no Tizen CLI, configured Samsung security profile, TV emulator, or physical Samsung TV. The public church host was blocked by cloud networking during the earlier implementation; production CORS, live broadcast, catalog schema, codecs, redirects, TLS compatibility and real archived files remain unverified. A passing browser test is not evidence of Samsung hardware playback. No signed release widget or Seller Office submission has been made.
 
+## Unsigned development package in the cloud
+
+No Samsung credentials or SDK are needed to create the unsigned development archive:
+
+```sh
+npm ci
+npm run check
+npm test
+npm run package:unsigned
+```
+
+Output: `artifacts/icbc-tv-1.0.0-unsigned.wgt`. This is a ZIP-format W3C/Tizen widget archive with `config.xml` and production resources at its root, **without** `author-signature.xml` or `signature1.xml`. The script validates its CRCs, manifest, required files and production allowlist, and fixes entry timestamps for repeatable output. Tests confirm two builds produce identical bytes in this environment and that the release validator rejects the unsigned file. It is useful for inspecting or handing off the package contents; it is not a signed, SDK-certified or TV-installable release. Samsung signing is required for physical-TV installation and Seller Office submission, rather than merely creating the archive file. No claim is made that an SDK simulator accepts this unsigned archive.
+
+Hosted GitHub CI now uploads `icbc-unsigned-development-widget` alongside the production-files artifact. This does not need a self-hosted runner or signing profile. The signed workflow explicitly excludes unsigned artifacts.
+
+### Current Linux SDK installation result
+
+The cloud machine is Debian 13 x86_64, with OpenJDK 21, Node, ZIP tooling and sufficient disk space. `tizen` is not installed. HTTPS requests to the official SDK download host `download.tizen.org` and documentation host `docs.tizen.org` were denied with HTTP 403 by the cloud network proxy, so no installer could be downloaded or verified and no SDK install or CLI unsigned-mode test was performed. Debian 13/OpenJDK 21 compatibility with the selected SDK remains unverified; Samsung/Tizen-supported Linux dependencies may require a supported Ubuntu release runner or container. No untrusted SDK mirror or TLS bypass was used.
+
+The saved cloud configuration draft adds `download.tizen.org`, `docs.tizen.org`, and `developer.samsung.com`, preserving the church host. Review/save those environment settings and publish the environment to activate the reusable configuration. A draft save itself does not change the running proxy policy. Once access is applied, retry official download discovery before choosing a current CLI installer; verify its official checksum/signature where supplied, install outside the checkout, and use its documented headless installation/Package Manager commands. Any additional Samsung extension download hostname must be identified from the actual official redirect/extension manifest before adding it. This task has not established that the SDK can run on Debian 13.
+
+### Minimum personal actions for a signed release
+
+There is no need to install anything on a Mac to obtain the unsigned package. A signed release can also be prepared on a trusted Linux workstation/cloud runner (or Windows), so Mac installation is not inherently required.
+
+1. Review/save the cloud domain additions if you want SDK installation retried here. This unblocks download investigation, not Samsung signing by itself.
+2. Use the church's authorized Samsung account to complete the Samsung TV author/distributor certificate wizard on a trusted machine with Certificate Manager. Keep the author certificate and its password private and securely backed up; the wizard may require personal account verification and acceptance of Samsung terms. A trusted operator can set up the Linux runner/toolchain for you; you need not send keys/passwords to this chat or repository.
+3. Keep that profile on the signing machine, set only `TIZEN_SECURITY_PROFILE` to its profile name, and run `npm run package:tizen` (or the manual GitHub workflow). Add a test TV's DUID to the distributor certificate and authorize installation for physical-device testing. Complete the real-TV checklist before submitting through the authorized Seller Office account.
+
+The SDK download blockage and absent private signing profile are separate prerequisites. This task cannot issue Samsung certificates, sign for the church, authorize a test TV, or publish to Seller Office without those operator/account actions.
+
 ## 1. Install the Samsung tooling
 
 On the release workstation (or a dedicated Linux runner):
@@ -62,11 +93,11 @@ tizen package -t wgt -s <profile-name> -o <temporary-package-directory> -- <temp
 
 The workflow validates first, recreates the **generated** `dist/` from the production allowlist, builds/signs in a new temporary directory, and only then copies the current widget to `artifacts/icbc-tv-1.0.0.wgt`. It excludes dependencies, tests, documents, Git metadata and certificate files from production. An old `.wgt` is never treated as the output of a failed current run. Temporary build files are removed on completion. Previous successful release artifacts are preserved on failure; do not upload them as a new build.
 
-The packager rejects failed SDK commands, absent/multiple widgets, unexpected archive files, damaged ZIP entries, missing runtime files, and missing author/distributor XML signature structures. These are structural checks: **they do not cryptographically validate certificate trust or replace Samsung SDK/device/store signature validation**. The SDK supplies the actual signatures. No unsigned ZIP is marketed as a release widget. Without the CLI and configured profile, packaging fails with a nonzero status and a precise prerequisite message.
+The packager rejects failed SDK commands, absent/multiple widgets, unexpected archive files, damaged ZIP entries, missing runtime files, and missing author/distributor XML signature structures. These are structural checks: **they do not cryptographically validate certificate trust or replace Samsung SDK/device/store signature validation**. The SDK supplies the actual signatures. The separate `package:unsigned` command creates only a clearly labeled development archive; it does not bypass these signed-release checks. No unsigned ZIP is marketed as a release widget. Without the CLI and configured profile, packaging fails with a nonzero status and a precise prerequisite message.
 
 ## 4. Automated GitHub builds
 
-`.github/workflows/ci.yml` runs on pushes to `main` and pull requests. It installs locked dependencies, validates the manifest/ES5 runtime, runs all tests using hosted Chrome, and uploads `dist/` as **production files**, not a signed widget. GitHub Actions must be enabled for the repository. A local test pass does not establish that a hosted workflow has run.
+`.github/workflows/ci.yml` runs on pushes to `main` and pull requests. It installs locked dependencies, validates the manifest/ES5 runtime, runs all tests using hosted Chrome, and uploads `dist/` as **production files**, plus a separately labeled unsigned development widget, not a signed release. GitHub Actions must be enabled for the repository. A local test pass does not establish that a hosted workflow has run.
 
 `.github/workflows/package.yml` is a **manual workflow_dispatch** release build. Before invoking it:
 

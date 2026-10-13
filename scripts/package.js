@@ -23,7 +23,7 @@ function run(command, args) {
         "); no release artifact was published"
     );
 }
-function verifyWidget(file, base) {
+function verifyWidget(file, base, { signed = true } = {}) {
   const zip = new AdmZip(file);
   if (!zip.test()) throw new Error("Widget ZIP integrity check failed");
   const entries = zip.getEntries(),
@@ -56,12 +56,16 @@ function verifyWidget(file, base) {
     "css/app.css",
     "assets/vendor/hls.min.js",
     "assets/vendor/HLS-LICENSE.txt",
-    "author-signature.xml",
-    "signature1.xml",
   ])
     if (!zip.getEntry(name)) throw new Error("Missing widget entry: " + name);
   validateManifest(zip.readAsText("config.xml"), base);
+  if (!signed) {
+    if (zip.getEntry("author-signature.xml") || zip.getEntry("signature1.xml"))
+      throw new Error("Unsigned widget must not contain signing files");
+    return names;
+  }
   for (const name of ["author-signature.xml", "signature1.xml"]) {
+    if (!zip.getEntry(name)) throw new Error("Missing widget entry: " + name);
     const signature = xml(zip.readAsText(name));
     if (
       signature.documentElement.localName !== "Signature" ||

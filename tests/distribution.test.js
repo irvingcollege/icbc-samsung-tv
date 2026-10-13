@@ -85,3 +85,25 @@ test("bundled HLS matches the integrity-checked locked dependency and includes i
     { ecmaVersion: 5 }
   );
 });
+
+test("unsigned development widgets are reproducible, validated and rejected as signed releases", () => {
+  const { packageUnsigned } = require("../scripts/package-unsigned");
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), "icbc-unsigned-test-"));
+  try {
+    const widget = packageUnsigned(temp),
+      first = fs.readFileSync(widget);
+    const entries = verifyWidget(widget, path.join(root, "dist"), {
+      signed: false,
+    });
+    assert.equal(entries.includes("author-signature.xml"), false);
+    assert.equal(entries.includes("signature1.xml"), false);
+    assert.throws(
+      () => verifyWidget(widget, path.join(root, "dist")),
+      /Missing widget entry: author-signature.xml/
+    );
+    packageUnsigned(temp);
+    assert.ok(first.equals(fs.readFileSync(widget)));
+  } finally {
+    fs.rmSync(temp, { recursive: true, force: true });
+  }
+});
