@@ -4,11 +4,11 @@
 
 The app targets Samsung Tizen **4.0+**, landscape **1920×1080**. `config.xml` retains package `ICBCTV2026`, application `ICBCTV2026.ICBCTV`, and widget version `1.0.0`. Keep the package/application IDs and author signing identity stable for updates; bump `config.xml` and `package.json` versions together for the next uploaded version. Do not adopt a new author certificate for an existing distributed application without Samsung's supported migration procedure.
 
-`npm run check` validates XML well-formedness, project manifest constraints, icon dimensions, packaged resource paths, version agreement, public Internet/input-device and Samsung AVPlay declarations, and ES5 parsing of runtime JavaScript. It is a project-specific validator, **not** Samsung's complete schema validator or store certification. The browser HLS fallback and its license are bundled locally, so production no longer loads code from a CDN. The screen-size metadata explicitly requests the 1920×1080 coordinate system used by AVPlay. Controls register optional media keys; arrows, Enter and Return work without key registration. AVPlay handles native HLS and MP4, keeps pause requests while loading, ignores stale callbacks after closing, and closes even if Stop fails. The layout uses flexbox with margins, explicit positioning edges and rgba colors instead of newer grid, flex-gap, inset and alpha-hex CSS features. Tests cover these contracts using mocks and browser fixtures; the minimum TV engine itself is not available here.
+`npm run check` validates XML well-formedness, project manifest constraints, icon dimensions, packaged resource paths, version agreement, public Internet/input-device declarations, and ES5 parsing of runtime JavaScript. It is a project-specific validator, **not** Samsung's complete schema validator or store certification. The browser HLS fallback and its license are bundled locally, so production no longer loads code from a CDN. The screen-size metadata explicitly requests the 1920×1080 coordinate system used by AVPlay. Controls register optional media keys; arrows, Enter and Return work without key registration. AVPlay handles native HLS and MP4, keeps pause requests while loading, ignores stale callbacks after closing, and closes even if Stop fails. The layout uses flexbox with margins, explicit positioning edges and rgba colors instead of newer grid, flex-gap, inset and alpha-hex CSS features. Tests cover these contracts using mocks and browser fixtures; the minimum TV engine itself is not available here.
 
 The cloud machine now has the official **Tizen SDK 10.0 Web CLI**, reporting **Tizen CLI 2.5.25**, installed at `/workspace/tizen-user-data/tizen-sdk-10`. The official SDK 10 web build succeeds. The manifest passes both the official generic widget XSD and each Tizen extension element's XSD. Official CLI packaging succeeds with the SDK's built-in **emulator-only test certificate**, without private credentials. The resulting `artifacts/icbc-tv-1.0.0-sdk-emulator-only.wgt` passes archive/signature-structure checks; it is **not** signed for Samsung physical TVs or Seller Office. No emulator execution, physical-TV playback, release signing or Seller Office submission has been performed.
 
-The Samsung TV extension itself still cannot be installed because its official download redirects to a newly discovered CDN host denied by the cloud proxy. Generic SDK checks do not replace that extension or Samsung certification.
+The official Samsung TV Extension 10.0 image has now downloaded successfully. Its checksum-verified web add-on validation resources are installed separately from the SDK, and Samsung-specific schema/privilege checks pass for TV 4.0 and 10.0. Full Package Manager/IDE installation is still blocked by a DNS preflight in this proxy-only environment. Resource validation does not establish emulator or physical-TV operation, certificate trust, or Samsung certification.
 
 ## Unsigned development package in the cloud
 
@@ -50,17 +50,35 @@ mkdir -p /tmp/icbc-sdk-test-package
 
 On this clean SDK installation, omitting `-s` selects the bundled emulator-only test profile; the CLI explicitly warns about that limit. On another installation it can select a configured default profile, so inspect the CLI's profile warning rather than assuming it is test-signed. Use the explicit Samsung profile through `npm run package:tizen` for release packaging. Test-profile widgets must never be uploaded as Samsung releases.
 
-The **Samsung TV extension** page redirects from `developer.samsung.com` to **`d13643hualop71.cloudfront.net`**, which currently returns proxy HTTP 403. The documentation host `docs.tizen.org` redirects to **`samsungtizenos.com`**, also blocked. Both exact hosts have been added to the cloud draft, preserving existing entries. Review/save those additions in environment settings and publish to continue TV-extension installation and current documentation access. Draft saving does not apply runtime networking. No untrusted mirrors, verification bypasses or downloaded private certificates were used.
+### Samsung TV validation resources and installation outcome
+
+The official Ubuntu TV Extension 10.0 download now succeeds through `d13643hualop71.cloudfront.net`. The web add-ons package inside the official image is SHA256 `c8e9d498504f29e8bf9320dab9e1cf89268e95eee65ff56c8d65a01fa0315086`, matching Samsung's `pkg_list_ubuntu-64` manifest. `setup:samsung-tv` checks the pinned vendor checksum and ZIP integrity, installs the unchanged resources outside the checkout, and caches the small verified web-add-ons bundle for repeat setup without redownloading the entire emulator image.
+
+```sh
+npm run setup:samsung-tv
+npm run check:samsung-tv
+npm run test:samsung-tv
+```
+
+The default resource root is `/workspace/tizen-user-data/samsung-tv10-resources`; scripts accept `--root` or `--resources` overrides. For an already downloaded official image, use `python3 scripts/setup-samsung-tv.py --image /path/to/image.zip`. Python lxml is required for validation and is available in this environment.
+
+The app's `config.xml` now passes the official **Samsung TV** widget and Tizen extension XSDs from the TV 4.0 and TV 10.0 resource directories. Declared native permissions are checked against the minimum target's TV catalog; Samsung permissions are checked against each target's Samsung catalog and restricted privilege levels are rejected. These are static schema/catalog checks, not API runtime authorization or Seller Office certification.
+
+This audit removed `http://developer.samsung.com/privilege/avplay`: it is absent from Samsung's privilege catalogs, and ordinary AVPlay use does not require it. Internet and `tv.inputdevice` are retained as public TV permissions. Samsung's AVPlay reference associates `drmplay` with protected DRM operations; this app does not use those operations, so no DRM/partner privilege is added. Remote registration, key codes, playback and lifecycle contracts are exercised by existing browser/mock tests. The three TV validation tests check the current manifest and reject unregistered AVPlay and partner-only permissions.
+
+A complete Package Manager install was attempted by registering the official offline image using `extra --add`, then installing `TV-SAMSUNG-Public-WebAppDevelopment`. The manager's network preflight calls native DNS for `download.tizen.org` **before using the proxy** and fails with `java.net.UnknownHostException: download.tizen.org: Temporary failure in name resolution`. Explicit manager proxy configuration and standard JVM proxy options did not resolve this preflight. Normal HTTPS downloads through the proxy work; adding more download domains will not repair this DNS requirement. No TLS/checksum verification was disabled. The full component also depends on Web IDE packages. No installed-package registry was fabricated, and the extracted validation resources are not described as a fully installed IDE.
+
+The simplest way to complete the IDE/certificate wizard is a trusted Linux workstation or runner with working native DNS and the supported Tizen Studio GUI dependencies, or a platform fix for the manager's DNS preflight. A Mac install is not required. The headless SDK build/package steps already work here. There is no `/dev/kvm` in this machine, and no Samsung emulator runtime or physical TV has been exercised.
 
 ### Minimum personal actions for a signed release
 
 There is no need to install anything on a Mac to obtain the unsigned package. A signed release can also be prepared on a trusted Linux workstation/cloud runner (or Windows), so Mac installation is not inherently required.
 
-1. Review/save the new CDN and documentation redirect hosts to finish Samsung TV-extension installation. The generic SDK is already installed and usable; this action alone does not provide Samsung signing credentials.
+1. For a complete IDE/certificate wizard, use a trusted supported Linux machine with normal DNS/GUI support, or have the cloud platform resolve Package Manager's native DNS preflight. Official downloads and Samsung TV resource validation already work; no further allowlist change is established as necessary.
 2. Use the church's authorized Samsung account to complete the Samsung TV author/distributor certificate wizard on a trusted machine with Certificate Manager. Keep the author certificate and its password private and securely backed up; the wizard may require personal account verification and acceptance of Samsung terms. A trusted operator can set up the Linux runner/toolchain for you; you need not send keys/passwords to this chat or repository.
 3. Keep that profile on the signing machine, set only `TIZEN_SECURITY_PROFILE` to its profile name, and run `npm run package:tizen` (or the manual GitHub workflow). Add a test TV's DUID to the distributor certificate and authorize installation for physical-device testing. Complete the real-TV checklist before submitting through the authorized Seller Office account.
 
-The TV-extension CDN blockage and absent Samsung release-signing profile are separate prerequisites. This task cannot issue Samsung certificates, sign for the church, authorize a test TV, or publish to Seller Office without those operator/account actions.
+The full IDE's DNS prerequisite and the absent Samsung release-signing profile are separate prerequisites. This task cannot issue Samsung certificates, sign for the church, authorize a test TV, or publish to Seller Office without those operator/account actions.
 
 ## 1. Install the Samsung tooling
 
@@ -173,3 +191,9 @@ Use the current target's SDK logs/Web Inspector to diagnose failures. ES5 syntax
 7. Submit for Samsung review/certification using the authorized account. Respond to issues, rebuild/sign/retest corrected versions and resubmit. Publish only after the church approves the release and Samsung accepts it.
 
 Account registration, certificate issuance, TV installation/playback verification, real production server access, release marketing/support/privacy inputs, and Seller Office review cannot be completed by the current cloud test environment. No passwords or private signing keys are required in chat to finish those steps.
+
+## Minimum remaining release steps
+
+1. **Samsung identity and signing:** an authorized church representative signs into the Samsung TV Certificate Manager wizard on the trusted signing machine, creates (or imports) the stable author certificate and a Samsung distributor certificate, and chooses **Public** privileges. Keep the author key/password and profile store private, backed up and outside Git/chat. Add the test TV DUID for development installation. No partner privilege is required by the current app.
+2. **Build and device evidence:** set only the existing profile name in `TIZEN_SECURITY_PROFILE`, point `TIZEN_CLI` at the installed CLI, and run `npm run package:tizen`. Run the physical-TV checklist with real live/archive media, validate CORS/codecs/TLS and keep the model/firmware/artifact results. The SDK's bundled emulator-only certificate cannot replace Samsung release signing.
+3. **Seller Office:** the authorized church account registers/selects the application, prepares the current required marketing icons/screenshots, approved privacy policy/support contact, content-rights and rating declarations, and reviewer playback instructions; upload the Samsung-signed widget and submit for Samsung review. Keep app IDs and author identity stable. No submission, approval, or physical-TV compatibility is claimed here.

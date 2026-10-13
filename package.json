@@ -10,7 +10,10 @@
     "package:tizen": "node scripts/package.js",
     "package:unsigned": "node scripts/package-unsigned.js",
     "setup:tizen": "python3 scripts/setup-tizen-linux.py",
-    "check:sdk": "python3 scripts/validate-tizen-sdk.py"
+    "check:sdk": "python3 scripts/validate-tizen-sdk.py",
+    "setup:samsung-tv": "python3 scripts/setup-samsung-tv.py",
+    "check:samsung-tv": "python3 scripts/validate-samsung-tv.py",
+    "test:samsung-tv": "python3 -m unittest discover -s tests -p test_samsung_tv.py"
   },
   "devDependencies": {
     "@xmldom/xmldom": "0.9.12",

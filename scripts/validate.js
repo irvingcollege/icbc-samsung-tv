@@ -64,7 +64,6 @@ function validateManifest(text, base = root) {
   const expected = [
     "http://tizen.org/privilege/internet",
     "http://tizen.org/privilege/tv.inputdevice",
-    "http://developer.samsung.com/privilege/avplay",
   ];
   assert(
     expected.every((p) => privileges.includes(p)) &&
