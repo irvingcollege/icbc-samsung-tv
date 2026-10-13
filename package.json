@@ -8,7 +8,9 @@
     "check": "node --check js/catalog.js && node --check js/platform.js && node --check js/app.js && node --check scripts/serve.js && node --check scripts/build.js && node scripts/validate.js && node --check scripts/package.js && node --check scripts/package-unsigned.js",
     "build": "node scripts/build.js",
     "package:tizen": "node scripts/package.js",
-    "package:unsigned": "node scripts/package-unsigned.js"
+    "package:unsigned": "node scripts/package-unsigned.js",
+    "setup:tizen": "python3 scripts/setup-tizen-linux.py",
+    "check:sdk": "python3 scripts/validate-tizen-sdk.py"
   },
   "devDependencies": {
     "@xmldom/xmldom": "0.9.12",

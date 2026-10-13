@@ -9,3 +9,4 @@ artifacts/
 *.p12
 *.pfx
 profiles.xml
+__pycache__/

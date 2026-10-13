@@ -28,5 +28,6 @@ jobs:
           path: |
             artifacts/icbc-tv-*.wgt
             !artifacts/*-unsigned.wgt
+            !artifacts/*-sdk-emulator-only.wgt
           if-no-files-found: error
           retention-days: 14

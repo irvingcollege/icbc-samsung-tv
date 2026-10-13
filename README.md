@@ -92,3 +92,7 @@ Publication requires the church's Samsung account, certificates, release assets 
 ## Future LG webOS adaptation
 
 `js/platform.js` owns media playback, remote registration and application exit. Keep the catalog/UI unchanged and supply a webOS adapter exposing `init`, `open`, `toggle`, `pause`, `resume`, `seek`, `close` and `exit` with the same event callbacks. Add LG key codes and `appinfo.json`, replace the Samsung `<object>`/SDK script, and validate LG native video and lifecycle behavior. The current package is Samsung Tizen only.
+
+## Official SDK checks in the cloud
+
+The official SDK 10 CLI is installed outside the checkout. `npm run setup:tizen` reproduces its checksum-verified headless installation; `npm run check:sdk` validates against its official generic widget and Tizen schemas (Python lxml required). SDK web building and emulator-only test signing have succeeded; Samsung TV-extension access, release signing and hardware testing remain outstanding. See the [current installation results](docs/distribution.md#current-linux-sdk-installation-result) before treating any artifact as a distribution release.

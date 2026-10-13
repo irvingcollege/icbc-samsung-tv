@@ -6,7 +6,9 @@ The app targets Samsung Tizen **4.0+**, landscape **1920×1080**. `config.xml` r
 
 `npm run check` validates XML well-formedness, project manifest constraints, icon dimensions, packaged resource paths, version agreement, public Internet/input-device and Samsung AVPlay declarations, and ES5 parsing of runtime JavaScript. It is a project-specific validator, **not** Samsung's complete schema validator or store certification. The browser HLS fallback and its license are bundled locally, so production no longer loads code from a CDN. The screen-size metadata explicitly requests the 1920×1080 coordinate system used by AVPlay. Controls register optional media keys; arrows, Enter and Return work without key registration. AVPlay handles native HLS and MP4, keeps pause requests while loading, ignores stale callbacks after closing, and closes even if Stop fails. The layout uses flexbox with margins, explicit positioning edges and rgba colors instead of newer grid, flex-gap, inset and alpha-hex CSS features. Tests cover these contracts using mocks and browser fixtures; the minimum TV engine itself is not available here.
 
-This cloud machine has Node and Chromium, but no Tizen CLI, configured Samsung security profile, TV emulator, or physical Samsung TV. The public church host was blocked by cloud networking during the earlier implementation; production CORS, live broadcast, catalog schema, codecs, redirects, TLS compatibility and real archived files remain unverified. A passing browser test is not evidence of Samsung hardware playback. No signed release widget or Seller Office submission has been made.
+The cloud machine now has the official **Tizen SDK 10.0 Web CLI**, reporting **Tizen CLI 2.5.25**, installed at `/workspace/tizen-user-data/tizen-sdk-10`. The official SDK 10 web build succeeds. The manifest passes both the official generic widget XSD and each Tizen extension element's XSD. Official CLI packaging succeeds with the SDK's built-in **emulator-only test certificate**, without private credentials. The resulting `artifacts/icbc-tv-1.0.0-sdk-emulator-only.wgt` passes archive/signature-structure checks; it is **not** signed for Samsung physical TVs or Seller Office. No emulator execution, physical-TV playback, release signing or Seller Office submission has been performed.
+
+The Samsung TV extension itself still cannot be installed because its official download redirects to a newly discovered CDN host denied by the cloud proxy. Generic SDK checks do not replace that extension or Samsung certification.
 
 ## Unsigned development package in the cloud
 
@@ -25,19 +27,40 @@ Hosted GitHub CI now uploads `icbc-unsigned-development-widget` alongside the pr
 
 ### Current Linux SDK installation result
 
-The cloud machine is Debian 13 x86_64, with OpenJDK 21, Node, ZIP tooling and sufficient disk space. `tizen` is not installed. HTTPS requests to the official SDK download host `download.tizen.org` and documentation host `docs.tizen.org` were denied with HTTP 403 by the cloud network proxy, so no installer could be downloaded or verified and no SDK install or CLI unsigned-mode test was performed. Debian 13/OpenJDK 21 compatibility with the selected SDK remains unverified; Samsung/Tizen-supported Linux dependencies may require a supported Ubuntu release runner or container. No untrusted SDK mirror or TLS bypass was used.
+Official downloads now work on `download.tizen.org`. The headless SDK 10.0 CLI installer was fetched from the official HTTPS index, its embedded vendor MD5 checksum checked, and its whole-file SHA256 pinned for repeatable installation. The SDK's bundled Java is used. The original installer shell wrapper requires a writable `$HOME/.package-manager`; this environment's home is mounted read-only even after a filesystem grant. The same unmodified Java installer is therefore launched with `-Duser.home` pointing to writable SDK storage, leaving the shell HOME unchanged. Installation remains outside the application checkout and preserves verification.
 
-The saved cloud configuration draft adds `download.tizen.org`, `docs.tizen.org`, and `developer.samsung.com`, preserving the church host. Review/save those environment settings and publish the environment to activate the reusable configuration. A draft save itself does not change the running proxy policy. Once access is applied, retry official download discovery before choosing a current CLI installer; verify its official checksum/signature where supplied, install outside the checkout, and use its documented headless installation/Package Manager commands. Any additional Samsung extension download hostname must be identified from the actual official redirect/extension manifest before adding it. This task has not established that the SDK can run on Debian 13.
+```sh
+npm run setup:tizen
+export TIZEN_CLI=/workspace/tizen-user-data/tizen-sdk-10/tools/ide/bin/tizen
+npm run check:sdk
+npm run build
+"$TIZEN_CLI" build-web --output /tmp/icbc-official-build -- dist
+```
+
+`setup:tizen` requires Linux x86_64 and Python 3.12+. It accepts the standard Tizen SDK license as part of the requested installation. It checks the pinned SHA256 and vendor payload MD5 before extraction, uses the included JDK and invokes the official installer. It supports `python3 scripts/setup-tizen-linux.py --root /your/writable/path`. Existing installations are reused. `check:sdk` uses Python `lxml` (6.1.1 is already available here); on a separate Linux machine install it in a virtual environment if absent. Set `TIZEN_SDK_PATH` for a nondefault SDK location. It loads only local official schemas, with remote retrieval/DTD expansion disabled. The check validates schema syntax, not privilege authorization or codec/device support.
+
+Tizen Studio 6.1's CLI was also investigated: its web build failed with missing `org/eclipse/core/runtime/Plugin`. The newer official SDK 10 package resolves that build failure without changes to application code. The Web IDE GUI installer requires GTK/display support and is unnecessary for the working headless build.
+
+To make a **local SDK test-signed package** from a successful build:
+
+```sh
+mkdir -p /tmp/icbc-sdk-test-package
+"$TIZEN_CLI" package -t wgt -o /tmp/icbc-sdk-test-package -- /tmp/icbc-official-build
+```
+
+On this clean SDK installation, omitting `-s` selects the bundled emulator-only test profile; the CLI explicitly warns about that limit. On another installation it can select a configured default profile, so inspect the CLI's profile warning rather than assuming it is test-signed. Use the explicit Samsung profile through `npm run package:tizen` for release packaging. Test-profile widgets must never be uploaded as Samsung releases.
+
+The **Samsung TV extension** page redirects from `developer.samsung.com` to **`d13643hualop71.cloudfront.net`**, which currently returns proxy HTTP 403. The documentation host `docs.tizen.org` redirects to **`samsungtizenos.com`**, also blocked. Both exact hosts have been added to the cloud draft, preserving existing entries. Review/save those additions in environment settings and publish to continue TV-extension installation and current documentation access. Draft saving does not apply runtime networking. No untrusted mirrors, verification bypasses or downloaded private certificates were used.
 
 ### Minimum personal actions for a signed release
 
 There is no need to install anything on a Mac to obtain the unsigned package. A signed release can also be prepared on a trusted Linux workstation/cloud runner (or Windows), so Mac installation is not inherently required.
 
-1. Review/save the cloud domain additions if you want SDK installation retried here. This unblocks download investigation, not Samsung signing by itself.
+1. Review/save the new CDN and documentation redirect hosts to finish Samsung TV-extension installation. The generic SDK is already installed and usable; this action alone does not provide Samsung signing credentials.
 2. Use the church's authorized Samsung account to complete the Samsung TV author/distributor certificate wizard on a trusted machine with Certificate Manager. Keep the author certificate and its password private and securely backed up; the wizard may require personal account verification and acceptance of Samsung terms. A trusted operator can set up the Linux runner/toolchain for you; you need not send keys/passwords to this chat or repository.
 3. Keep that profile on the signing machine, set only `TIZEN_SECURITY_PROFILE` to its profile name, and run `npm run package:tizen` (or the manual GitHub workflow). Add a test TV's DUID to the distributor certificate and authorize installation for physical-device testing. Complete the real-TV checklist before submitting through the authorized Seller Office account.
 
-The SDK download blockage and absent private signing profile are separate prerequisites. This task cannot issue Samsung certificates, sign for the church, authorize a test TV, or publish to Seller Office without those operator/account actions.
+The TV-extension CDN blockage and absent Samsung release-signing profile are separate prerequisites. This task cannot issue Samsung certificates, sign for the church, authorize a test TV, or publish to Seller Office without those operator/account actions.
 
 ## 1. Install the Samsung tooling
 
