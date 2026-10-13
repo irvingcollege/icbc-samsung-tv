@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<widget xmlns="http://www.w3.org/ns/widgets" xmlns:tizen="http://tizen.org/ns/widgets" id="https://www.irvingcollege.church/tv" version="1.0.0" viewmodes="maximized">
+  <tizen:application id="ICBCTV2026.ICBCTV" package="ICBCTV2026" required_version="4.0"/>
+  <content src="index.html"/>
+  <name>Irving College Baptist Church</name>
+  <icon src="assets/icon.png"/>
+  <author href="https://www.irvingcollege.church">Irving College Baptist Church</author>
+  <description>A Place of Hope for Warren County. Watch live and archived sermons.</description>
+  <tizen:profile name="tv-samsung"/>
+  <tizen:privilege name="http://tizen.org/privilege/internet"/>
+  <tizen:privilege name="http://tizen.org/privilege/tv.inputdevice"/>
+  <tizen:privilege name="http://developer.samsung.com/privilege/avplay"/>
+  <access origin="https://live.irvingcollege.church" subdomains="true"/>
+  <tizen:setting screen-orientation="landscape" context-menu="disable" background-support="disable" encryption="disable" install-location="auto" hwkey-event="enable"/>
+</widget>

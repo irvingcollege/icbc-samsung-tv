@@ -1,0 +1,242 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: #0c1920;
+  color: #f7f3e9;
+  font-family: Arial, sans-serif;
+  font-size: 26px;
+}
+main {
+  padding: 54px 86px;
+  background: radial-gradient(ellipse at 80% 20%, #244b47 0, transparent 55%);
+  min-height: 100vh;
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.brand {
+  display: flex;
+  gap: 22px;
+  align-items: center;
+  font-size: 26px;
+  letter-spacing: 3px;
+  font-weight: bold;
+}
+.cross {
+  width: 72px;
+  height: 72px;
+  border-radius: 12px;
+}
+small {
+  display: block;
+  font-size: 17px;
+  margin-top: 8px;
+  letter-spacing: 5px;
+}
+.location,
+.eyebrow {
+  font-size: 18px;
+  letter-spacing: 3px;
+  color: #dfbd7c;
+}
+.hero {
+  margin-top: 68px;
+  width: 65%;
+}
+h1 {
+  font-size: 76px;
+  line-height: 1.12;
+  margin: 22px 0;
+  letter-spacing: -2px;
+}
+.intro {
+  font-size: 28px;
+  color: #c9d7d6;
+}
+.actions {
+  display: flex;
+  gap: 24px;
+  margin-top: 36px;
+}
+button {
+  font: inherit;
+  color: #f7f3e9;
+  background: #243b43;
+  border: 3px solid transparent;
+  border-radius: 12px;
+  padding: 18px 30px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+button.primary {
+  background: #dfbd7c;
+  color: #14262a;
+  font-weight: bold;
+}
+button:focus {
+  outline: 5px solid white;
+  outline-offset: 5px;
+  background: #43656c;
+}
+button.primary:focus {
+  background: #f2d6a2;
+}
+.site {
+  font-size: 22px;
+  color: #b8cbc8;
+  margin-top: 32px;
+}
+.schedule {
+  position: absolute;
+  right: 86px;
+  top: 245px;
+  width: 420px;
+  background: #ffffff08;
+  border: 1px solid #ffffff25;
+  border-radius: 20px;
+  padding: 24px 32px;
+}
+.schedule h2 {
+  color: #dfbd7c;
+  font-size: 26px;
+}
+.schedule p {
+  display: flex;
+  justify-content: space-between;
+  font-size: 22px;
+}
+.schedule .timezone {
+  font-size: 17px;
+  color: #b8cbc8;
+  margin-top: 28px;
+}
+#sermons {
+  margin-top: 64px;
+}
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+h2 {
+  font-size: 32px;
+}
+.section-heading button {
+  font-size: 22px;
+  padding: 12px 24px;
+}
+#sermon-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 26px;
+}
+.sermon {
+  text-align: left;
+  min-height: 168px;
+  padding: 26px;
+}
+.sermon span {
+  display: block;
+  font-size: 28px;
+  line-height: 1.25;
+}
+.sermon small {
+  font-size: 20px;
+  letter-spacing: 0;
+  color: #c4d5d3;
+  font-weight: normal;
+  line-height: 1.5;
+}
+#catalog-status {
+  color: #c4d5d3;
+}
+footer {
+  margin-top: 40px;
+  font-size: 18px;
+  color: #a6bcbb;
+}
+.hidden {
+  display: none !important;
+}
+#player {
+  position: fixed;
+  inset: 0;
+  background: #000;
+}
+video,
+#av-player {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+}
+#player-ui {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 30px 70px;
+  background: linear-gradient(transparent, #000e 35%);
+}
+#player-ui h2 {
+  margin: 18px 0;
+}
+#playback-controls {
+  display: flex;
+  gap: 22px;
+}
+#player-status {
+  color: #edce92;
+}
+#progress {
+  font-size: 20px;
+  color: #c4d5d3;
+}
+dialog {
+  background: #152c33;
+  color: #fff;
+  border: 2px solid #dfbd7c;
+  border-radius: 20px;
+  padding: 40px;
+  max-width: 700px;
+}
+dialog::backdrop {
+  background: #000b;
+}
+dialog button {
+  margin-right: 24px;
+}
+@media (max-width: 1100px) {
+  main {
+    padding: 32px;
+  }
+  h1 {
+    font-size: 48px;
+  }
+  .schedule {
+    position: static;
+    width: 100%;
+    margin-top: 40px;
+    display: flex;
+    gap: 40px;
+  }
+  .hero {
+    width: 100%;
+  }
+  .location {
+    display: none;
+  }
+  #sermon-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  #playback-controls {
+    flex-wrap: wrap;
+  }
+  body {
+    font-size: 22px;
+  }
+}
