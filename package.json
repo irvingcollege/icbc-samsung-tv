@@ -13,7 +13,8 @@
     "check:sdk": "python3 scripts/validate-tizen-sdk.py",
     "setup:samsung-tv": "python3 scripts/setup-samsung-tv.py",
     "check:samsung-tv": "python3 scripts/validate-samsung-tv.py",
-    "test:samsung-tv": "python3 -m unittest discover -s tests -p test_samsung_tv.py"
+    "test:samsung-tv": "python3 -m unittest discover -s tests -p test_samsung_tv.py",
+    "assets:seller": "node scripts/seller-assets.js && python3 scripts/verify-seller-assets.py"
   },
   "devDependencies": {
     "@xmldom/xmldom": "0.9.12",
