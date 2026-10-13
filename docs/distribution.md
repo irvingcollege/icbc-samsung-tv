@@ -93,7 +93,7 @@ On the release workstation (or a dedicated Linux runner):
 Official references (consult the current pages for SDK/portal UI changes):
 
 - [Samsung TV prerequisites](https://developer.samsung.com/smarttv/develop/getting-started/setting-up-sdk/installing-tv-sdk.html)
-- [Samsung certificate creation](https://developer.samsung.com/smarttv/develop/getting-started/creating-certificate.html)
+- [Samsung certificate creation](https://developer.samsung.com/smarttv/develop/getting-started/setting-up-sdk/creating-certificates.html)
 - [Tizen CLI](https://docs.tizen.org/application/tizen-studio/common-tools/command-line-interface/)
 - [Samsung AVPlay API](https://developer.samsung.com/smarttv/develop/api-references/samsung-product-api-references/avplay-api.html)
 - [Samsung remote controls](https://developer.samsung.com/smarttv/develop/guides/user-interaction/remote-control.html)
@@ -102,6 +102,8 @@ Official references (consult the current pages for SDK/portal UI changes):
 These documentation hosts were unavailable to this cloud instance; the steps use the established Studio/CLI flow, and have not been executed against an installed TV SDK here.
 
 ## 2. Create the Samsung author/distributor profile
+
+For the shortest current route, use the [VS Code Samsung certificate wizard and secure signing handoff](release-signing-next-step.md). The Studio Certificate Manager flow below remains an alternative.
 
 Do this interactively on your trusted workstation; no password or private key needs to be shared with this repository or the chat.
 
