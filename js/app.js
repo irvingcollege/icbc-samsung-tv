@@ -217,7 +217,7 @@
     var key = mediaKeys[event.key] || event.keyCode;
     if (
       [37, 38, 39, 40, 13, 27, 10009, 415, 19, 10252, 413, 412, 417].indexOf(
-        key,
+        key
       ) < 0
     )
       return;

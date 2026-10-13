@@ -20,13 +20,13 @@ header {
 }
 .brand {
   display: flex;
-  gap: 22px;
   align-items: center;
   font-size: 26px;
   letter-spacing: 3px;
   font-weight: bold;
 }
 .cross {
+  margin-right: 22px;
   width: 72px;
   height: 72px;
   border-radius: 12px;
@@ -59,7 +59,6 @@ h1 {
 }
 .actions {
   display: flex;
-  gap: 24px;
   margin-top: 36px;
 }
 button {
@@ -95,8 +94,8 @@ button.primary:focus {
   right: 86px;
   top: 245px;
   width: 420px;
-  background: #ffffff08;
-  border: 1px solid #ffffff25;
+  background: rgba(255, 255, 255, 0.031);
+  border: 1px solid rgba(255, 255, 255, 0.145);
   border-radius: 20px;
   padding: 24px 32px;
 }
@@ -130,11 +129,13 @@ h2 {
   padding: 12px 24px;
 }
 #sermon-list {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 26px;
+  display: flex;
+  flex-wrap: wrap;
+  margin: -13px;
 }
 .sermon {
+  width: calc(33.333333% - 26px);
+  margin: 13px;
   text-align: left;
   min-height: 168px;
   padding: 26px;
@@ -164,7 +165,10 @@ footer {
 }
 #player {
   position: fixed;
-  inset: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   background: #000;
 }
 video,
@@ -180,14 +184,13 @@ video,
   bottom: 0;
   width: 100%;
   padding: 30px 70px;
-  background: linear-gradient(transparent, #000e 35%);
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.933) 35%);
 }
 #player-ui h2 {
   margin: 18px 0;
 }
 #playback-controls {
   display: flex;
-  gap: 22px;
 }
 #player-status {
   color: #edce92;
@@ -205,7 +208,7 @@ dialog {
   max-width: 700px;
 }
 dialog::backdrop {
-  background: #000b;
+  background: rgba(0, 0, 0, 0.733);
 }
 dialog button {
   margin-right: 24px;
@@ -222,7 +225,6 @@ dialog button {
     width: 100%;
     margin-top: 40px;
     display: flex;
-    gap: 40px;
   }
   .hero {
     width: 100%;
@@ -230,13 +232,26 @@ dialog button {
   .location {
     display: none;
   }
-  #sermon-list {
-    grid-template-columns: repeat(2, 1fr);
+  .sermon {
+    width: calc(50% - 26px);
   }
   #playback-controls {
     flex-wrap: wrap;
   }
   body {
     font-size: 22px;
+  }
+}
+
+.actions button + button {
+  margin-left: 24px;
+}
+#playback-controls button {
+  margin-right: 22px;
+  margin-bottom: 12px;
+}
+@media (max-width: 1100px) {
+  .schedule > div {
+    margin-right: 40px;
   }
 }

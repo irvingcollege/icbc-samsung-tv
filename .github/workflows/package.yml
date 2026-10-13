@@ -1,0 +1,30 @@
+name: Signed Samsung widget
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  package:
+    if: github.ref == 'refs/heads/main'
+    environment: samsung-release
+    runs-on: [self-hosted, linux, tizen, samsung-signing]
+    env:
+      TIZEN_CLI: ${{ vars.TIZEN_CLI }}
+      TIZEN_SECURITY_PROFILE: ${{ vars.TIZEN_SECURITY_PROFILE }}
+      CHROMIUM_PATH: ${{ vars.CHROMIUM_PATH }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm test
+      - run: npm run package:tizen
+      - uses: actions/upload-artifact@v4
+        with:
+          name: icbc-signed-widget-${{ github.run_id }}
+          path: artifacts/*.wgt
+          if-no-files-found: error
+          retention-days: 14

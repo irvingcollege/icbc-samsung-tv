@@ -16,11 +16,11 @@ test("loads arrays and documented wrapper formats", () => {
           date: "2026-10-11",
           speaker: "Pastor",
         },
-      ]),
+      ])
     );
     assert.equal(
       rows[0].url,
-      "https://live.irvingcollege.church/sermons/hope.mp4",
+      "https://live.irvingcollege.church/sermons/hope.mp4"
     );
     assert.equal(rows[0].title, "Hope");
   }
@@ -37,8 +37,8 @@ test("rejects unsafe media and permits HLS and signed MP4 URLs", () => {
     assert.equal(catalog.mediaUrl(url), null);
   assert.ok(
     catalog.mediaUrl(
-      "https://live.irvingcollege.church/sermons/a.mp4?token=abc",
-    ),
+      "https://live.irvingcollege.church/sermons/a.mp4?token=abc"
+    )
   );
   assert.ok(catalog.mediaUrl("../hls/stream.m3u8"));
 });
@@ -50,7 +50,7 @@ test("filters bad records and preserves an empty catalog", () => {
       { title: "bad" },
       { url: "https://evil.example/a.mp4" },
     ]),
-    [],
+    []
   );
   assert.throws(() => catalog.normalize({ bad: [] }));
 });

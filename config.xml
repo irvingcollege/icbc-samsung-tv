@@ -6,6 +6,7 @@
   <icon src="assets/icon.png"/>
   <author href="https://www.irvingcollege.church">Irving College Baptist Church</author>
   <description>A Place of Hope for Warren County. Watch live and archived sermons.</description>
+  <tizen:metadata key="http://samsung.com/tv/metadata/screen.size" value="1920x1080"/>
   <tizen:profile name="tv-samsung"/>
   <tizen:privilege name="http://tizen.org/privilege/internet"/>
   <tizen:privilege name="http://tizen.org/privilege/tv.inputdevice"/>

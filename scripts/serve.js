@@ -21,7 +21,7 @@ http
     }
     const file = path.resolve(
       root,
-      "." + (name === "/" ? "/index.html" : name),
+      "." + (name === "/" ? "/index.html" : name)
     );
     if (
       !file.startsWith(root + path.sep) ||
@@ -43,7 +43,5 @@ http
     });
   })
   .listen(Number(process.env.PORT) || 8080, "0.0.0.0", () =>
-    console.log(
-      "ICBC development server on port " + (process.env.PORT || 8080),
-    ),
+    console.log("ICBC development server on port " + (process.env.PORT || 8080))
   );

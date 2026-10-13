@@ -30,7 +30,7 @@
             row.video ||
             row.file ||
             row.filename ||
-            row.src,
+            row.src
         );
         if (!url) return null;
         return {

@@ -4,3 +4,8 @@ node_modules/
 *.wgt
 test-results/
 dist/
+artifacts/
+.tizen-build/
+*.p12
+*.pfx
+profiles.xml

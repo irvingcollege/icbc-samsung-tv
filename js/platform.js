@@ -26,6 +26,8 @@
     if (av && nativeOpen) {
       try {
         av.stop();
+      } catch (e) {}
+      try {
         av.close();
       } catch (e) {}
       nativeOpen = false;
@@ -48,21 +50,24 @@
       if (token === generation)
         emit(
           "error",
-          "Unable to play this video. The stream may be offline or unavailable.",
+          "Unable to play this video. The stream may be offline or unavailable."
         );
     };
     video.onended = function () {
-      emit("ended");
+      if (token === generation) emit("ended");
     };
     video.onwaiting = function () {
-      emit("buffering");
+      if (token === generation) emit("buffering");
     };
     video.ontimeupdate = function () {
-      emit("time", { current: video.currentTime, duration: video.duration });
+      if (token === generation)
+        emit("time", { current: video.currentTime, duration: video.duration });
     };
     function start() {
+      if (token !== generation) return;
       video.play().catch(function () {
-        emit("error", "Playback could not start. Select Retry to try again.");
+        if (token === generation)
+          emit("error", "Playback could not start. Select Retry to try again.");
       });
     }
     if (
@@ -74,7 +79,7 @@
         if (!root.Hls || !root.Hls.isSupported()) {
           emit(
             "error",
-            "HLS playback is unavailable in this browser. Use a Samsung TV or a supported browser.",
+            "HLS playback is unavailable in this browser. Use a Samsung TV or a supported browser."
           );
           return;
         }
@@ -83,21 +88,20 @@
         hls.attachMedia(video);
         hls.on(root.Hls.Events.MANIFEST_PARSED, start);
         hls.on(root.Hls.Events.ERROR, function (e, data) {
-          if (data.fatal)
+          if (token === generation && data.fatal)
             emit("error", "The live stream is offline or could not be loaded.");
         });
       }
       if (root.Hls) attach();
       else {
         var script = document.createElement("script");
-        script.src =
-          "https://cdn.jsdelivr.net/npm/hls.js@1.6.13/dist/hls.min.js";
+        script.src = "assets/vendor/hls.min.js";
         script.onload = attach;
         script.onerror = function () {
           if (token === generation)
             emit(
               "error",
-              "Browser HLS support could not load. Check your network connection.",
+              "Browser HLS support could not load. Check your network connection."
             );
         };
         document.head.appendChild(script);
@@ -134,7 +138,7 @@
         if (token === generation)
           emit(
             "error",
-            "The stream did not respond. Check your connection and select Retry.",
+            "The stream did not respond. Check your connection and select Retry."
           );
       }, 20000);
       emit("buffering");
@@ -149,45 +153,58 @@
         av.setDisplayMethod("PLAYER_DISPLAY_MODE_LETTER_BOX");
         av.setListener({
           onbufferingstart: function () {
-            emit("buffering");
+            if (token === generation) emit("buffering");
           },
           onbufferingcomplete: function () {
+            if (token !== generation) return;
             emit("ready");
+            emit("paused", paused);
           },
           oncurrentplaytime: function (ms) {
+            if (token !== generation) return;
             emit("time", {
               current: ms / 1000,
               duration: av.getDuration() / 1000,
             });
           },
           onstreamcompleted: function () {
-            emit("ended");
+            if (token === generation) emit("ended");
           },
           onerror: function () {
+            if (token !== generation) return;
             emit(
               "error",
-              "The stream is offline or playback failed. Select Retry to reconnect.",
+              "The stream is offline or playback failed. Select Retry to reconnect."
             );
           },
         });
         av.prepareAsync(
           function () {
             if (token !== generation) return;
-            av.play();
-            emit("ready");
+            try {
+              av.play();
+              if (paused) av.pause();
+              emit("ready");
+              emit("paused", paused);
+            } catch (e) {
+              emit(
+                "error",
+                "Unable to start TV playback. Select Retry to try again."
+              );
+            }
           },
           function () {
             if (token === generation)
               emit(
                 "error",
-                "This video is currently unavailable. Please try again later.",
+                "This video is currently unavailable. Please try again later."
               );
-          },
+          }
         );
       } catch (e) {
         emit(
           "error",
-          "Unable to start TV playback. Select Retry to try again.",
+          "Unable to start TV playback. Select Retry to try again."
         );
       }
     },
@@ -200,6 +217,9 @@
           } else if (av.getState() === "PAUSED") {
             av.play();
             paused = false;
+          } else if (nativeOpen) {
+            // Preserve a Pause request made during asynchronous preparation.
+            paused = !paused;
           }
         } else if (video.paused) {
           video.play().catch(function () {
@@ -230,13 +250,13 @@
             av.seekTo(
               Math.max(
                 0,
-                Math.min(duration - 1000, av.getCurrentTime() + seconds * 1000),
-              ),
+                Math.min(duration - 1000, av.getCurrentTime() + seconds * 1000)
+              )
             );
         } else if (Number.isFinite(video.duration))
           video.currentTime = Math.max(
             0,
-            Math.min(video.duration, video.currentTime + seconds),
+            Math.min(video.duration, video.currentTime + seconds)
           );
       } catch (e) {
         emit("error", "Seeking is unavailable for this stream.");

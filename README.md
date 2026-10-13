@@ -1,6 +1,6 @@
 # Irving College Baptist Church TV
 
-A Samsung Tizen web app for Irving College Baptist Church in Warren County, Tennessee. **A Place of Hope for Warren County.** HTML, CSS and vanilla JavaScript provide the interface; Samsung AVPlay handles HLS live streams and archived MP4s on TVs. Browser playback uses HTML video, with pinned HLS.js loaded on demand for browsers without native HLS. No login or backend is required.
+A Samsung Tizen web app for Irving College Baptist Church in Warren County, Tennessee. **A Place of Hope for Warren County.** HTML, CSS and vanilla JavaScript provide the interface; Samsung AVPlay handles HLS live streams and archived MP4s on TVs. Browser playback uses HTML video, with bundled HLS.js loaded on demand for browsers without native HLS. No login or backend is required.
 
 ## Develop and check
 
@@ -50,7 +50,7 @@ The server must return a valid HTTPS certificate, `application/json` for the cat
 
 Browser catalog/HLS requests need server-side CORS headers. For public church media, `Access-Control-Allow-Origin: *` is appropriate without credentials. Permit GET/HEAD and, if preflight is used, Range; expose Content-Length, Content-Range and Accept-Ranges. Set headers consistently on playlists, segments, MP4s, JSON and error responses. Samsung widget access declarations and CSP do not bypass server CORS. Do not work around errors by disabling TLS or browser security. Inspect server CORS and TV logs instead. Native AVPlay may behave differently from browser fetch, so test both paths.
 
-Samsung TV playback uses its built-in AVPlay; it does not load HLS.js. The browser fallback downloads `hls.js@1.6.13` from `cdn.jsdelivr.net` on first live playback. If that host is unavailable, the UI reports it. For deployments requiring an entirely offline dependency bundle, vendor the verified distribution and update the script path/CSP before packaging.
+Samsung TV playback uses its built-in AVPlay; it does not load HLS.js. The browser fallback loads the bundled `assets/vendor/hls.min.js` (HLS.js 1.6.13, Apache-2.0 license included) on first live playback. No remote JavaScript CDN is needed. The locked npm package is used only to verify/refresh the vendored bundle during development; production includes the file itself.
 
 ## Remote controls and lifecycle
 
@@ -71,16 +71,13 @@ Service times are Central Time: Sunday School 9:30 AM, Sunday Worship 10:30 AM, 
 5. For a TV, enable Developer Mode in Apps, enter the development computer's IP, reboot, connect through Tizen Device Manager (commonly port 26101), and authorize package installation with your certificate. Use the SDK's documented device connection flow for that model. Run/install the signed widget through Tizen Studio.
 6. Test live HLS during an actual broadcast, offline live behavior, real catalog, MP4 playback/pause/seek/end, network loss/recovery, repeated open/close, remote media keys, Back on every screen, suspend/resume and app exit. Check logs for AVPlay errors and CORS failures. Record model, firmware and test results; this repository makes no physical-TV test claim.
 
-For CLI packaging after installing the TV SDK and configuring a certificate profile:
+For automated validation, SDK signing, dedicated-runner configuration and the full device/store checklist, follow [the distribution runbook](docs/distribution.md). With the SDK installed and a Samsung profile registered securely on the release machine:
 
 ```sh
-npm run build
-tizen build-web --output .wgt -- dist
-tizen package -t wgt -s YOUR_SAMSUNG_CERTIFICATE_PROFILE -- .wgt
-tizen install -n YOUR_GENERATED_WIDGET.wgt -t YOUR_DEVICE_NAME -- .wgt
+TIZEN_SECURITY_PROFILE=ICBC-TV npm run package:tizen
 ```
 
-Use `tizen build-web --help` for the SDK version's exclusion options. The staged `dist/` input already excludes development artifacts. Inspect the build output and, if any extra files were added by tooling, remove `node_modules`, `tests`, `scripts`, package manifests/lockfile, `.git`, README and other development artifacts from **the output directory only** before `tizen package`. The production allowlist is the six entries listed under Develop. Do not delete source files to package. A signed `.wgt` needs your certificate profile; no signing credentials or Tizen CLI were available in this cloud instance, so packaging/installation have not been executed here.
+This creates `artifacts/icbc-tv-1.0.0.wgt` only after a successful SDK build/sign operation and archive checks. Without the SDK/profile, it fails rather than fabricating a signed widget. Normal GitHub CI uploads production files; the manual signed-widget workflow requires a trusted, preconfigured Samsung signing runner.
 
 ## Samsung Seller Office submission
 
