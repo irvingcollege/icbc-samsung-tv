@@ -11,6 +11,7 @@ args = parser.parse_args()
 xml_parser = etree.XMLParser(no_network=True, resolve_entities=False)
 doc = etree.parse(str(args.config), xml_parser)
 TIZEN = '{http://tizen.org/ns/widgets}'
+assert any(el.get('name') == 'http://tizen.org/feature/screen.size.all' for el in doc.findall('{http://www.w3.org/ns/widgets}feature')), 'Samsung Seller Office requires screen.size.all feature'
 assert doc.find(TIZEN+'profile').get('name') == 'tv-samsung', 'Expected Samsung TV profile'
 assert doc.find(TIZEN+'application').get('required_version') == '4.0', 'Minimum version changed; update target checks'
 for version in ['4.0', '10.0']:

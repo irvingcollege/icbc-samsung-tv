@@ -70,6 +70,8 @@ function validateManifest(text, base = root) {
       privileges.length === expected.length,
     "Unexpected or missing privilege"
   );
+  const features = Array.from(doc.getElementsByTagNameNS(W, "feature"), el => el.getAttribute("name"));
+  assert(features.includes("http://tizen.org/feature/screen.size.all"), "Samsung Seller Office requires screen.size.all feature");
   const access = one(W, "access");
   assert(
     access.getAttribute("origin") === "https://live.irvingcollege.church",
