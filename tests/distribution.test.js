@@ -12,7 +12,7 @@ const { verifyWidget } = require("../scripts/package");
 const root = path.resolve(__dirname, ".."),
   config = fs.readFileSync(path.join(root, "config.xml"), "utf8");
 test("manifest rejects missing privileges, wrong IDs and malformed XML", () => {
-  assert.equal(validateManifest(config).version, "1.0.0");
+  assert.equal(validateManifest(config).version, require("../package.json").version);
   for (const bad of [
     config.replace("tv-samsung", "mobile"),
     config.replace('package="ICBCTV2026"', 'package="bad"'),
